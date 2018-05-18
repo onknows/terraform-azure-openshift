@@ -1,7 +1,7 @@
 ---
 - name: Ensure Docker is installed
   yum:
-    name: "docker-1.12.6"
+    name: "docker"
     state: present
     enablerepo: "epel"
 
