@@ -11,6 +11,9 @@
 - name: Ensure required Python packages are installed
   include: python.yml
 
+- name: Ensure pyyaml is installed
+  include: pyyaml.yml
+
 - name: Ensure Docker is properly installed
   include: docker.yml
 
