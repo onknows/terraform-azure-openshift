@@ -20,6 +20,10 @@ NODE_MAX_INDEX=$((NODE_COUNT-1))
 sed -i "s/###NODE_COUNT###/$NODE_MAX_INDEX/g" ansible/inventory/hosts
 sed -i "s/###ADMIN_USER###/$ADMIN_USER/g" ansible/inventory/hosts
 
+#### EXIT
+exit
+#### EXIT
+
 cd ansible
 ansible-playbook -i inventory/hosts host-preparation.yml
 cd ../..
