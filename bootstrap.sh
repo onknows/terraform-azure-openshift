@@ -19,6 +19,7 @@ CONSOLE_IP=$(terraform output console_public_ip)
 NODE_COUNT=$(terraform output node_count)
 ADMIN_USER=$(terraform output admin_user)
 MASTER_DOMAIN=$(terraform output master_domain)
+MASTER_0=$(terraform output master0_ip)
 
 cd ..
 
@@ -35,3 +36,4 @@ echo "Finished!!"
 echo "Console: https://$CONSOLE_IP:8443"
 echo "Bastion: ssh -i certs/bastion.key $ADMIN_USER@$BASTION_IP"
 echo "Router: $SERVICE_IP"
+echo "Master0: $MASTER_0"

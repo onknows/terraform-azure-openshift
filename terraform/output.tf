@@ -21,3 +21,8 @@ output "admin_user" {
 output "master_domain" {
   value = "${var.master_domain}"
 }
+
+output "master0_ip" {
+  value = "${azurerm_network_interface.master.0.ip_address}"
+}
+
