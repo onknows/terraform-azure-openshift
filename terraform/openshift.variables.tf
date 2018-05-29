@@ -8,6 +8,7 @@ variable "node_vm_size" {}
 variable "master_vm_size" {}
 variable "infra_vm_size" {}
 variable "bastion_vm_size" {}
+variable "revproxy_vm_size" {}
 variable "admin_user" {}
 variable "admin_password" {}
 variable "master_domain" {}

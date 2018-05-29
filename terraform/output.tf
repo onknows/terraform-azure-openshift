@@ -1,5 +1,5 @@
 output "bastion_public_ip" {
-  value = "${azurerm_public_ip.bastion.ip_address}"
+  value = "51.144.183.213"
 }
 
 output "console_public_ip" {
@@ -22,7 +22,7 @@ output "master_domain" {
   value = "${var.master_domain}"
 }
 
-output "master0_ip" {
-  value = "${azurerm_network_interface.master.0.ip_address}"
-}
+#output "master0_ip" {
+#  value = "${azurerm_network_interface.master.0.ip_address}"
+#}
 

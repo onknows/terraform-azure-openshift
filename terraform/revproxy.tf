@@ -1,45 +1,59 @@
 
-resource "azurerm_network_interface" "bastion" {
-  name                      = "openshift-bastion-nic"
+resource "azurerm_network_interface" "revproxy" {
+  name                      = "openshift-revproxy-nic"
   location                  = "${var.azure_location}"
   resource_group_name       = "${azurerm_resource_group.openshift.name}"
-  network_security_group_id = "${azurerm_network_security_group.bastion.id}"
+  network_security_group_id = "${azurerm_network_security_group.revproxy.id}"
 
   ip_configuration {
     name                          = "default"
-    public_ip_address_id          = "${var.bastion-public-ip}"
+    public_ip_address_id          = "${var.openshift-public-ip}"
     subnet_id                     = "${azurerm_subnet.other.id}"
     private_ip_address_allocation = "dynamic"
   }
 }
 
-resource "azurerm_network_security_group" "bastion" {
-  name                = "openshift-bastion-security-group"
+resource "azurerm_network_security_group" "revproxy" {
+  name                = "openshift-revproxy-security-group"
   location            = "${var.azure_location}"
   resource_group_name = "${azurerm_resource_group.openshift.name}"
 }
 
-resource "azurerm_network_security_rule" "bastion-ssh" {
-  name                        = "bastion-ssh"
+
+resource "azurerm_network_security_rule" "revproxy-http" {
+  name                        = "revproxy-http"
   priority                    = 100
   direction                   = "Inbound"
   access                      = "Allow"
   protocol                    = "TCP"
   source_port_range           = "*"
-  destination_port_range      = 22
+  destination_port_range      = 80
   source_address_prefix       = "*"
   destination_address_prefix  = "*"
   resource_group_name         = "${azurerm_resource_group.openshift.name}"
-  network_security_group_name = "${azurerm_network_security_group.bastion.name}"
+  network_security_group_name = "${azurerm_network_security_group.revproxy.name}"
 }
 
+resource "azurerm_network_security_rule" "revproxy-https" {
+  name                        = "revproxy-https"
+  priority                    = 101
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "TCP"
+  source_port_range           = "*"
+  destination_port_range      = 443
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = "${azurerm_resource_group.openshift.name}"
+  network_security_group_name = "${azurerm_network_security_group.revproxy.name}"
+}
 
-resource "azurerm_virtual_machine" "bastion" {
-  name                  = "openshift-bastion-vm"
+resource "azurerm_virtual_machine" "revproxy" {
+  name                  = "openshift-revproxy-vm"
   location              = "${var.azure_location}"
   resource_group_name   = "${azurerm_resource_group.openshift.name}"
-  network_interface_ids = ["${azurerm_network_interface.bastion.id}"]
-  vm_size               = "${var.bastion_vm_size}"
+  network_interface_ids = ["${azurerm_network_interface.revproxy.id}"]
+  vm_size               = "${var.revproxy_vm_size}"
 
   storage_image_reference {
     publisher = "Canonical"
@@ -49,7 +63,7 @@ resource "azurerm_virtual_machine" "bastion" {
   }
 
   storage_os_disk {
-    name              = "openshift-bastion-vm-os-disk"
+    name              = "openshift-revproxy-vm-os-disk"
     caching           = "ReadWrite"
     create_option     = "FromImage"
     managed_disk_type = "Standard_LRS"
@@ -59,7 +73,7 @@ resource "azurerm_virtual_machine" "bastion" {
   delete_data_disks_on_termination = true
 
   os_profile {
-    computer_name  = "bastion"
+    computer_name  = "revproxy"
     admin_username = "${var.admin_user}"
     admin_password = "${var.admin_password}"
   }
@@ -71,15 +85,4 @@ resource "azurerm_virtual_machine" "bastion" {
       key_data = "${file("${path.module}/../certs/bastion.pub")}"
     }
   }
-
-  # provisioner "remote-exec" {
-  #  script = "${path.module}/provision/bastion.sh"
-  #
-  #  connection {
-  #    type        = "ssh"
-  #    host        = "${azurerm_public_ip.bastion.ip_address}"
-  #    user        = "${var.admin_user}"
-  #    private_key = "${file("${path.module}/../certs/bastion.key")}"
-  #  }
-  # }
 }
