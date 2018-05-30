@@ -1,5 +1,7 @@
 variable "resource_group_name" {}
 variable "node_count" {}
+variable "master_count" {}
+variable "infra_count" {}
 variable "os_image_publisher" {}
 variable "os_image_offer" {}
 variable "os_image_sku" {}
@@ -11,4 +13,3 @@ variable "bastion_vm_size" {}
 variable "revproxy_vm_size" {}
 variable "admin_user" {}
 variable "admin_password" {}
-variable "master_domain" {}
