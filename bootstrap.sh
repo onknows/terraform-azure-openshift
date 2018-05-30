@@ -4,10 +4,10 @@ set -e
 cd terraform
 
 echo "Synchronizing Terraform state..."
-terraform refresh -var-file=../azure.tfvars -var-file=../bootstrap.tfvars
+terraform refresh -var-file=azure.tfvars -var-file=bootstrap.tfvars
 
 echo "Planning Terraform changes..."
-terraform plan -out openshift.plan -var-file=../azure.tfvars -var-file=../bootstrap.tfvars
+terraform plan -out openshift.plan -var-file=azure.tfvars -var-file=bootstrap.tfvars
 
 echo "Deploying Terraform plan..."
 terraform apply openshift.plan
@@ -17,23 +17,22 @@ BASTION_IP=$(terraform output bastion_public_ip)
 SERVICE_IP=$(terraform output service_public_ip)
 CONSOLE_IP=$(terraform output console_public_ip)
 NODE_COUNT=$(terraform output node_count)
+MASTER_COUNT=$(terraform output master_count)
+INFRA_COUNT=$(terraform output infra_count)
 ADMIN_USER=$(terraform output admin_user)
-MASTER_DOMAIN=$(terraform output master_domain)
-MASTER_0=$(terraform output master0_ip)
 
 cd ..
 
 echo "Transfering private key to bastion server..."
 scp -o StrictHostKeychecking=no -i certs/bastion.key certs/openshift.key $ADMIN_USER@$BASTION_IP:/home/openshift/.ssh/id_rsa
 
-echo "Transfering install script to bastion server..."
-scp -o StrictHostKeychecking=no -i certs/bastion.key scripts/install.sh $ADMIN_USER@$BASTION_IP:/home/openshift/install.sh
+# echo "Transfering install script to bastion server..."
+# scp -o StrictHostKeychecking=no -i certs/bastion.key scripts/install.sh $ADMIN_USER@$BASTION_IP:/home/openshift/install.sh
 
-echo "Running install script on bastion server..."
-ssh -t -o StrictHostKeychecking=no -i certs/bastion.key $ADMIN_USER@$BASTION_IP ./install.sh $NODE_COUNT $ADMIN_USER $MASTER_DOMAIN
+# echo "Running install script on bastion server..."
+# ssh -t -o StrictHostKeychecking=no -i certs/bastion.key $ADMIN_USER@$BASTION_IP ./install.sh $NODE_COUNT $ADMIN_USER $MASTER_DOMAIN
 
-echo "Finished!!"
-echo "Console: https://$CONSOLE_IP:8443"
-echo "Bastion: ssh -i certs/bastion.key $ADMIN_USER@$BASTION_IP"
-echo "Router: $SERVICE_IP"
-echo "Master0: $MASTER_0"
+# echo "Finished!!"
+# echo "Console: https://$CONSOLE_IP:8443"
+# echo "Bastion: ssh -i certs/bastion.key $ADMIN_USER@$BASTION_IP"
+# echo "Router: $SERVICE_IP"
