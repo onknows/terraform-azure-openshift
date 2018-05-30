@@ -1,5 +1,7 @@
 resource_group_name = "openshift"
-node_count = "2"
+node_count = "2" # default 2
+master_count = "3" # default 3
+infra_count = "3" # default 3
 node_vm_size = "Standard_A2m_v2"
 master_vm_size = "Standard_A2m_v2"
 infra_vm_size = "Standard_A2m_v2"
