@@ -101,25 +101,6 @@ resource "azurerm_virtual_machine" "bastion" {
       key_data = "${file("${path.module}/../certs/bastion.pub")}"
     }
   }
-
-  #provisioner "chef" {
-  #  environment     = "${var.chef_environment}"
-  #  run_list        = ["${var.chef_run_list}"]
-  #  node_name       = "bastion"
-  #  secret_key      = "${file(var.chef_secret_key)}"
-  #  server_url      = "${var.chef_server_url}"
-  #  recreate_client = true
-  #  user_name       = "${var.chef_user_name}"
-  #  user_key        = "${file(var.chef_user_key)}"
-  #  version         = "${var.chef_version}"
-  #  ssl_verify_mode = ":verify_none" # :verify_peer
-  #  connection {
-  #    host        = "${var.chef_connection_host}"
-  #    type        = "ssh"
-  #    user        = "${var.admin_user}"
-  #    private_key = "${file("${path.module}/${var.chef_connection_private_key_bastion}")}"
-  #  }
-  #}
 }
 
 
