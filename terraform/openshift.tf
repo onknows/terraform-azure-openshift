@@ -10,6 +10,11 @@ resource "azurerm_resource_group" "openshift" {
   location = "${var.azure_location}"
 }
 
+resource "azurerm_resource_group" "openshift-data" {
+  name     = "${var.resource_group_name}-data"
+  location = "${var.azure_location}"
+}
+
 resource "azurerm_storage_account" "openshift" {
   name                = "openshift${lower(replace(substr(uuid(), 0, 10), "-", ""))}"
   resource_group_name = "${azurerm_resource_group.openshift.name}"

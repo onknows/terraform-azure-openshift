@@ -33,6 +33,28 @@ resource "azurerm_network_security_rule" "bastion-ssh" {
   network_security_group_name = "${azurerm_network_security_group.bastion.name}"
 }
 
+resource "azurerm_network_security_rule" "bastion-ssh-31815" {
+  name                        = "bastion-ssh-31815"
+  priority                    = 101
+  direction                   = "Inbound"
+  access                      = "Allow"
+  protocol                    = "TCP"
+  source_port_range           = "*"
+  destination_port_range      = 31815
+  source_address_prefix       = "*"
+  destination_address_prefix  = "*"
+  resource_group_name         = "${azurerm_resource_group.openshift.name}"
+  network_security_group_name = "${azurerm_network_security_group.bastion.name}"
+}
+
+resource "azurerm_managed_disk" "bastion" {
+  name                 = "openshift-nfs-data"
+  location             = "${var.azure_location}"
+  resource_group_name  = "${azurerm_resource_group.openshift-data.name}"
+  storage_account_type = "Standard_LRS"
+  create_option        = "Empty"
+  disk_size_gb         = "200"
+}
 
 resource "azurerm_virtual_machine" "bastion" {
   name                  = "openshift-bastion-vm"
@@ -55,8 +77,16 @@ resource "azurerm_virtual_machine" "bastion" {
     managed_disk_type = "Standard_LRS"
   }
 
+  storage_data_disk {
+    name            = "${azurerm_managed_disk.bastion.name}"
+    managed_disk_id = "${azurerm_managed_disk.bastion.id}"
+    create_option   = "Attach"
+    lun             = 1
+    disk_size_gb    = "${azurerm_managed_disk.bastion.disk_size_gb}"
+  }
+
   delete_os_disk_on_termination    = true
-  delete_data_disks_on_termination = true
+  delete_data_disks_on_termination = false
 
   os_profile {
     computer_name  = "bastion"
@@ -72,24 +102,24 @@ resource "azurerm_virtual_machine" "bastion" {
     }
   }
 
-  provisioner "chef" {
-    environment     = "${var.chef_environment}"
-    run_list        = ["${var.chef_run_list}"]
-    node_name       = "bastion"
-    secret_key      = "${file(var.chef_secret_key)}"
-    server_url      = "${var.chef_server_url}"
-    recreate_client = true
-    user_name       = "${var.chef_user_name}"
-    user_key        = "${file(var.chef_user_key)}"
-    version         = "${var.chef_version}"
-    ssl_verify_mode = ":verify_none" # :verify_peer
-    connection {
-      host        = "${var.chef_connection_host}"
-      type        = "ssh"
-      user        = "${var.admin_user}"
-      private_key = "${file("${path.module}/${var.chef_connection_private_key_bastion}")}"
-    }
-  }
+  #provisioner "chef" {
+  #  environment     = "${var.chef_environment}"
+  #  run_list        = ["${var.chef_run_list}"]
+  #  node_name       = "bastion"
+  #  secret_key      = "${file(var.chef_secret_key)}"
+  #  server_url      = "${var.chef_server_url}"
+  #  recreate_client = true
+  #  user_name       = "${var.chef_user_name}"
+  #  user_key        = "${file(var.chef_user_key)}"
+  #  version         = "${var.chef_version}"
+  #  ssl_verify_mode = ":verify_none" # :verify_peer
+  #  connection {
+  #    host        = "${var.chef_connection_host}"
+  #    type        = "ssh"
+  #    user        = "${var.admin_user}"
+  #    private_key = "${file("${path.module}/${var.chef_connection_private_key_bastion}")}"
+  #  }
+  #}
 }
 
 

@@ -23,8 +23,8 @@ ADMIN_USER=$(terraform output admin_user)
 
 cd ..
 
-echo "Transfering private key to bastion server..."
-scp -o StrictHostKeychecking=no -i certs/bastion.key certs/openshift.key $ADMIN_USER@$BASTION_IP:/home/openshift/.ssh/id_rsa
+# echo "Transfering private key to bastion server..."
+# scp -o StrictHostKeychecking=no -i certs/bastion.key certs/openshift.key $ADMIN_USER@$BASTION_IP:/home/openshift/.ssh/id_rsa
 
 # echo "Transfering install script to bastion server..."
 # scp -o StrictHostKeychecking=no -i certs/bastion.key scripts/install.sh $ADMIN_USER@$BASTION_IP:/home/openshift/install.sh
